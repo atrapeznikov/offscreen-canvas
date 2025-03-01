@@ -16,6 +16,11 @@
             border-radius: 5px;
             color: white;
         }
+        input {
+            width: 50px;
+            padding: 5px;
+            font-size: 16px;
+        }
         button {
             background: #ff5722;
             border: none;
@@ -32,15 +37,17 @@
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    
+
     <div id="controls">
         <p>Частиц: <span id="particleCount">0</span></p>
-        <button id="addParticle">Добавить частицу</button>
+        <input id="particleInput" type="number" min="1" value="1">
+        <button id="addParticle">Добавить</button>
     </div>
 
     <script>
         const canvas = document.getElementById("canvas");
         const particleCount = document.getElementById("particleCount");
+        const particleInput = document.getElementById("particleInput");
         const addParticleBtn = document.getElementById("addParticle");
 
         canvas.width = window.innerWidth;
@@ -63,7 +70,8 @@
 
             // Обработка кнопки добавления частицы
             addParticleBtn.addEventListener("click", () => {
-                worker.postMessage({ type: "addParticle" });
+                const count = parseInt(particleInput.value) || 1;
+                worker.postMessage({ type: "addParticle", count });
             });
 
             // Обновляем размеры при изменении окна

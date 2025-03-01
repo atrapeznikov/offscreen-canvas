@@ -7,7 +7,7 @@ self.onmessage = (event) => {
             resizeCanvas(event.data.width, event.data.height);
             break;
         case "addParticle":
-            addParticle();
+            addParticles(event.data.count);
             break;
     }
 };
@@ -21,8 +21,8 @@ function setupCanvas(offscreen, w, h) {
     width = w;
     height = h;
 
-    // Создаем 150 частиц изначально
-    for (let i = 0; i < 150; i++) {
+    // Создаем 50 частиц изначально
+    for (let i = 0; i < 50; i++) {
         particles.push(new Particle(Math.random() * width, Math.random() * height));
     }
 
@@ -35,8 +35,11 @@ function resizeCanvas(w, h) {
     height = h;
 }
 
-function addParticle() {
-    particles.push(new Particle(Math.random() * width, Math.random() * height));
+function addParticles(count) {
+    debugger
+    for (let i = 0; i < count; i++) {
+        particles.push(new Particle(Math.random() * width, Math.random() * height));
+    }
     updateParticleCount();
 }
 
@@ -56,13 +59,12 @@ class Particle {
     }
 
     update() {
-        this.vy += 0.05; // Гравитация, можно изменять как вам хочется
+        this.vy += 0.05;
         this.x += this.vx;
         this.y += this.vy;
 
-        // Столкновения со стенами
         if (this.x - this.radius < 0 || this.x + this.radius > width) this.vx *= -1;
-        if (this.y - this.radius < 0 || this.y + this.radius > height) this.vy *= -0.8; // Отскок с потерей энергии
+        if (this.y - this.radius < 0 || this.y + this.radius > height) this.vy *= -0.8;
     }
 
     draw() {
@@ -76,7 +78,6 @@ class Particle {
 
 function animate() {
     ctx.clearRect(0, 0, width, height);
-
     particles.forEach(p => {
         p.update();
         p.draw();
