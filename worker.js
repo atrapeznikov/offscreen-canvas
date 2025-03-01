@@ -21,8 +21,8 @@ function setupCanvas(offscreen, w, h) {
     width = w;
     height = h;
 
-    // Создаем 50 частиц изначально
-    for (let i = 0; i < 50; i++) {
+    // Создаем 100 частиц изначально
+    for (let i = 0; i < 100; i++) {
         particles.push(new Particle(Math.random() * width, Math.random() * height));
     }
 
