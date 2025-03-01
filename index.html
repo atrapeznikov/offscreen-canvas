@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffscreenCanvas Particles</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: black; font-family: Arial, sans-serif; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        button {
+            background: #ff5722;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: #e64a19;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="controls">
+        <p>Частиц: <span id="particleCount">0</span></p>
+        <button id="addParticle">Добавить частицу</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const particleCount = document.getElementById("particleCount");
+        const addParticleBtn = document.getElementById("addParticle");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let worker;
+        if (window.OffscreenCanvas) {
+            worker = new Worker("worker.js");
+
+            // Передаем OffscreenCanvas в воркер
+            const offscreen = canvas.transferControlToOffscreen();
+            worker.postMessage({ type: "init", canvas: offscreen, width: canvas.width, height: canvas.height }, [offscreen]);
+
+            // Обновляем счетчик из воркера
+            worker.onmessage = (event) => {
+                if (event.data.type === "updateCount") {
+                    particleCount.textContent = event.data.count;
+                }
+            };
+
+            // Обработка кнопки добавления частицы
+            addParticleBtn.addEventListener("click", () => {
+                worker.postMessage({ type: "addParticle" });
+            });
+
+            // Обновляем размеры при изменении окна
+            window.addEventListener("resize", () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                worker.postMessage({ type: "resize", width: canvas.width, height: canvas.height });
+            });
+        } else {
+            // Обработка для браузеров без поддержки OffscreenCanvas
+            console.error("OffscreenCanvas не поддерживается в этом браузере.");
+        }
+    </script>
+</body>
+</html>
